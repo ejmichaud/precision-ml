@@ -73,6 +73,7 @@ class ConjugateGradients(torch.optim.Optimizer):
                 if p.grad is not None:
                     params_with_grad.append(p)
                     d_p_list.append(p.grad.detach().clone())
+        
         # save parameters of model
         initial_params_with_grad_data = [param.data.detach().clone() 
                     for param in params_with_grad]
@@ -80,14 +81,14 @@ class ConjugateGradients(torch.optim.Optimizer):
         if self.prev_grads is None:
             direction = [-g for g in d_p_list]
         else:
-            beta = self._dot_prod(d_p_list, d_p_list) / self._dot_prod(self.prev_grads, self.prev_grads)
+            beta = self._dot_prod([d_p_list[i] - self.prev_grads[i] for i in range(len(d_p_list))], d_p_list) / self._dot_prod(self.prev_grads, self.prev_grads)
             direction = [- d_p_list[i] + beta * self.prev_direction[i] for i in range(len(d_p_list))]
         if self.search: # line search method
             best_loss = float('inf')
             best_params_with_grad_data = None
             for lr in self.lr_range:
                 for i, param in enumerate(params_with_grad):
-                    param.add_(-lr * direction[i])
+                    param.add_(-lr * direction[i]) # should this be a negative?
                 loss = closure()
                 if loss.item() < best_loss:
                     best_loss = loss.item()
@@ -99,7 +100,9 @@ class ConjugateGradients(torch.optim.Optimizer):
             for i, param in enumerate(params_with_grad):
                 param.data = best_params_with_grad_data[i]
         else: # step size computation under quadratic assumption
-            sigma = 1e-6
+            for param in params_with_grad:
+                param.grad = None
+            sigma = 1e-5 # be very careful about this value
             for i, param in enumerate(params_with_grad):
                 param.add_(sigma * direction[i])
             with torch.enable_grad():
@@ -112,10 +115,12 @@ class ConjugateGradients(torch.optim.Optimizer):
             for i, param in enumerate(params_with_grad):
                 param.data = initial_params_with_grad_data[i]
             for i, param in enumerate(params_with_grad):
+                param.grad = d_p_list[i]
+            for i, param in enumerate(params_with_grad):
                 param.add_(epsilon * direction[i])
         # store grad and direction for next step
-        self.prev_grads = d_p_list
-        self.prev_direction = direction
+        self.prev_grads = [g.clone() for g in d_p_list]
+        self.prev_direction = [d.clone() for d in direction]
 
 
 # class GradientSearch(torch.optim.Optimizer):

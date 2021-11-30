@@ -18,6 +18,6 @@ setuptools.setup(
         "numpy",
         "torch"
     ],
-    packages = ['precisionml'],
+    packages=['precisionml'],
 )
 

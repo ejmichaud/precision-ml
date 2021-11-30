@@ -19,3 +19,8 @@ loss_fn(model(input), target).backward()
 optimizer.step()
 ```
 
+## Testing
+I've written some tests in the `tests/` directory. Run them with:
+```
+pytest tests/
+```
