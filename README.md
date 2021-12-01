@@ -1,6 +1,6 @@
 # precision-ml
 
-Tools for training neural networks to very high precision.
+Tools for training neural networks to very high precision. Implements the custom optimizers `ConjugateGradients` and `GreedyEnsembleOptimizer`. 
 
 ## Installation
 ```

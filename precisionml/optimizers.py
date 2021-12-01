@@ -16,11 +16,13 @@ class ConjugateGradients(torch.optim.Optimizer):
         >>> optimizer = ConjugateGradients(model.parameters())
         >>> optimizer.zero_grad()
         >>> loss_fn(model(input), target).backward()
-        >>> optimizer.step()
+        >>> optimizer.step(closure) # closure computes and returns loss when called
 
     TODO: Implement a fancier line search algorithm. Currently I just do
         a grid search over many orders of magnitude and chose the lowest-loss
         step length.
+    TODO: Return loss (evaluated with closure) from the step() method like
+        the built-in PyTorch optimizers do. 
     """
     
     def __init__(self, params, search=False):
@@ -123,6 +125,70 @@ class ConjugateGradients(torch.optim.Optimizer):
         self.prev_direction = [d.clone() for d in direction]
 
 
+class GreedyEnsembleOptimizer(torch.optim.Optimizer):
+    """Implements the optimizer which chooses the best step found
+    by a collection of optimizers.
+    
+    Args:
+        params (iterable): iterable of parameters to optimize
+        optimizers (list[torch.optim.Optimizer]): list of optimizers
+            to try on each step
+    
+    Example:
+        >>> opt1 = torch.optim.Adam(model.parameters())
+        >>> opt2 = ConjugateGradients(model.parameters())
+        >>> optimizer = GreedyEnsembleOptimizer(model.parameters, [opt1, opt2])
+        >>> optimizer.zero_grad()
+        >>> loss_fn(model(input), target).backward()
+        >>> optimizer.step()
+    """
+    
+    def __init__(self, params, optimizers):
+        defaults = dict()
+        super(GreedyEnsembleOptimizer, self).__init__(params, defaults)
+        self.optimizers = optimizers
+
+    @torch.no_grad()
+    def step(self, closure=None):
+        """Perform an optimization step, the best one among our list
+        of optimizers.
+        
+        Args:
+            closure (callable): An function that takes no arguments and
+                evaluates the model's loss and returns it. Unlike in first-order
+                methods, this argument is not optional.
+        """
+        if any(type(opt) in [ConjugateGradients, torch.optim.LBFGS] for opt in self.optimizers):
+            assert closure is not None, "Must pass a closure to evaluate loss"
+
+        params_with_grad = []
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is not None:
+                    params_with_grad.append(p)
+        
+        # save parameters of model
+        initial_params_with_grad_data = [param.data.detach().clone() 
+                    for param in params_with_grad]
+        
+        best_loss = float('inf')
+        best_params_with_grad_data = None
+        for optimizer in self.optimizers:
+            optimizer.step(closure)
+            loss = closure()
+            # TODO: possibly just set the loss equal to whatever is returned from optimizer.step()
+            if loss.item() < best_loss:
+                best_loss = loss.item()
+                best_params_with_grad_data = [param.data.detach().clone()
+                    for param in params_with_grad]
+            for i, param in enumerate(params_with_grad):
+                param.data = initial_params_with_grad_data[i]
+        for i, param in enumerate(params_with_grad):
+            param.data = best_params_with_grad_data[i]
+        # TODO: possibly return loss here. 
+                    
+
+        
 # class GradientSearch(torch.optim.Optimizer):
 #     def __init__(self, params):
 #         defaults = dict()
