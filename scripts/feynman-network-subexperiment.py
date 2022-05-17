@@ -18,11 +18,16 @@ from tqdm.auto import tqdm
 import torch
 import torch.nn as nn
 
+import seml
 from sacred import Experiment
 from sacred.utils import apply_backspaces_and_linefeeds
 ex = Experiment("feynman-network-subexperiment")
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
+
+@ex.post_run_hook
+def collect_stats(_run):
+    seml.collect_exp_stats(_run)
 
 # --------------------------
 #    ,-------------.
