@@ -56,6 +56,11 @@ def cfg():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     dtype = torch.float64
 
+    overwrite = None
+    db_collection = None
+    if db_collection is not None:
+        ex.observers.append(seml.create_mongodb_observer(db_collection, overwrite=overwrite))
+
 # --------------------------
 #  |-|    *
 #  |-|   _    *  __
