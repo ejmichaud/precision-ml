@@ -48,7 +48,7 @@ def cfg():
     lr = 1e-3
     activation = nn.ReLU
     N_TEST_POINTS = 30000
-    TEST_COMPACTIFICATION = 0.9
+    TEST_COMPACTIFICATION = 0.8
     DATA_RATIO = 1.0
     MAX_TRAIN_ITERS = 25000
     MAX_BATCH_SIZE = 30000
@@ -93,10 +93,10 @@ def run(eqn, width, depth, lr, activation,
     ls = xs.min(axis=0)
     hs = xs.max(axis=0)
     cs = (hs + ls) / 2
-    ws = (hs - ls) / 2
+    ws = (hs - ls) * TEST_COMPACTIFICATION
     ls, hs = cs - ws / 2, cs + ws / 2
     interior_points = [k for k in range(len(xs)) if 
-                np.all((xs[k] > TEST_COMPACTIFICATION * ls) & (xs[k] < TEST_COMPACTIFICATION * hs))]
+                np.all((xs[k] > ls) & (xs[k] < hs))]
     xs = torch.from_numpy(xs).to(device)
     ys = torch.from_numpy(ys).to(device)
     # choose test data
