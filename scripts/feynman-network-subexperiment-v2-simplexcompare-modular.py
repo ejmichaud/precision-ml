@@ -24,7 +24,7 @@ import torch.nn as nn
 import seml
 from sacred import Experiment
 from sacred.utils import apply_backspaces_and_linefeeds
-ex = Experiment("feynman-network-subexperiment-v2-simplexcompare")
+ex = Experiment("feynman-network-subexperiment-v2-simplexcompare-modular")
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
 
