@@ -61,14 +61,13 @@ def make_mlp(input_dim, depth, width, activation_fn):
 #        DEFINE MODELS
 # ---------------------------
 class I_8_14(nn.Module):
-    def __init__(self, N, depth, activation_fn, device):
+    def __init__(self, width, depth, activation_fn, device):
         super().__init__()
+        assert depth % 2 == 0, "For this problem, modular architecture has two steps"
         self.device = device
-        N_per_module = N // 3
-        width2d = width_given_ddp(depth, 2, N_per_module)
-        self.mlpxs = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mlpys = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mlpaddsqrt = make_mlp(2, depth, width2d, activation_fn).to(device)
+        self.mlpxs = make_mlp(2, depth // 2, width // 2, activation_fn).to(device)
+        self.mlpys = make_mlp(2, depth // 2, width // 2, activation_fn).to(device)
+        self.mlpaddsqrt = make_mlp(2, depth // 2, width, activation_fn).to(device)
     
     def forward(self, x):
         x = x.to(self.device)
@@ -76,54 +75,53 @@ class I_8_14(nn.Module):
         ys = self.mlpys(x[:, 2:])
         return self.mlpaddsqrt(torch.cat([xs, ys], dim=1))
 
-class I_39_22(nn.Module):
-    def __init__(self, N, depth, activation_fn, device):
-        super().__init__()
-        self.device = device
-        N_per_module = N // 3
-        width2d = width_given_ddp(depth, 2, N_per_module)
-        self.mul1 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mul2 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.div1 = make_mlp(2, depth, width2d, activation_fn).to(device)
+# class I_39_22(nn.Module):
+#     def __init__(self, N, depth, activation_fn, device):
+#         super().__init__()
+#         self.device = device
+#         N_per_module = N // 3
+#         width2d = width_given_ddp(depth, 2, N_per_module)
+#         self.mul1 = make_mlp(2, depth, width2d, activation_fn).to(device)
+#         self.mul2 = make_mlp(2, depth, width2d, activation_fn).to(device)
+#         self.div1 = make_mlp(2, depth, width2d, activation_fn).to(device)
     
-    def forward(self, x):
-        x = x.to(self.device)
-        nkb = self.mul1(x[:, [0, 3]])
-        nkbT = self.mul2(torch.cat([nkb, x[:, [1]]]))
-        nkbT_V = self.div1(torch.cat([nkbT, x[:, [2]]]))
-        return nkbT_V
+#     def forward(self, x):
+#         x = x.to(self.device)
+#         nkb = self.mul1(x[:, [0, 3]])
+#         nkbT = self.mul2(torch.cat([nkb, x[:, [1]]]))
+#         nkbT_V = self.div1(torch.cat([nkbT, x[:, [2]]]))
+#         return nkbT_V
         
-class I_44_4(nn.Module):
-    def __init__(self, N, depth, activation_fn, device):
-        super().__init__()
-        self.device = device
-        N_per_module = N // 4
-        width2d = width_given_ddp(depth, 2, N_per_module)
-        self.mul1 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mul2 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.logdiv = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mul3 = make_mlp(2, depth, width2d, activation_fn).to(device)
+# class I_44_4(nn.Module):
+#     def __init__(self, N, depth, activation_fn, device):
+#         super().__init__()
+#         self.device = device
+#         N_per_module = N // 4
+#         width2d = width_given_ddp(depth, 2, N_per_module)
+#         self.mul1 = make_mlp(2, depth, width2d, activation_fn).to(device)
+#         self.mul2 = make_mlp(2, depth, width2d, activation_fn).to(device)
+#         self.logdiv = make_mlp(2, depth, width2d, activation_fn).to(device)
+#         self.mul3 = make_mlp(2, depth, width2d, activation_fn).to(device)
     
-    def forward(self, x):
-        x = x.to(self.device)
-        nkb = self.mul1(x[:, [0, 1]])
-        nkbT = self.mul2(torch.cat([nkb, x[:, [2]]], dim=1))
-        logV1_V2 = self.logdiv(x[:, [3, 4]])
-        nkbTlogV1_V2 = self.mul3(torch.cat([nkbT, logV1_V2], dim=1))
-        return nkbTlogV1_V2
+#     def forward(self, x):
+#         x = x.to(self.device)
+#         nkb = self.mul1(x[:, [0, 1]])
+#         nkbT = self.mul2(torch.cat([nkb, x[:, [2]]], dim=1))
+#         logV1_V2 = self.logdiv(x[:, [3, 4]])
+#         nkbTlogV1_V2 = self.mul3(torch.cat([nkbT, logV1_V2], dim=1))
+#         return nkbTlogV1_V2
 
 
 class II_6_15a(nn.Module):
-    def __init__(self, N, depth, activation_fn, device):
+    def __init__(self, width, depth, activation_fn, device):
         super().__init__()
+        assert depth % 3 == 0, "modular architecture has 3 steps"
         self.device = device
-        N_per_module = N // 5
-        width2d = width_given_ddp(depth, 2, N_per_module)
-        self.rnorm = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mul1 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.mul2 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.epsilonr5 = make_mlp(2, depth, width2d, activation_fn).to(device)
-        self.div1 = make_mlp(2, depth, width2d, activation_fn).to(device) 
+        self.rnorm = make_mlp(2, depth // 3, width // 3, activation_fn).to(device)
+        self.mul1 = make_mlp(2, depth // 3, width // 3, activation_fn).to(device)
+        self.mul2 = make_mlp(2, depth // 3, width, activation_fn).to(device)
+        self.epsilonr5 = make_mlp(2, depth // 3, width // 3, activation_fn).to(device)
+        self.div1 = make_mlp(2, depth // 3, width, activation_fn).to(device) 
 
     def forward(self, x):
         x = x.to(self.device)
@@ -135,7 +133,7 @@ class II_6_15a(nn.Module):
 
 NAME_TO_MODULE = {
     'I.8.14': I_8_14,
-    'I.44.4': I_44_4,
+    # 'I.44.4': I_44_4,
     'II.6.15a': II_6_15a
 }
 
@@ -159,7 +157,7 @@ def collect_stats(_run):
 @ex.config
 def cfg():
     eqn = 'I.10.7'
-    N_parameters = int(1e5)
+    width = 100
     depth = 3
     lr = 1e-3
     activation = 'ReLU'
@@ -289,3 +287,4 @@ def run(eqn, N_parameters, depth, lr, activation,
     ex.info['min_test'] = min_test
     ex.info['test_at_min_train'] = test_at_min_train
     _log.debug("Test loss: {:.3e}".format(test_at_min_train))
+
