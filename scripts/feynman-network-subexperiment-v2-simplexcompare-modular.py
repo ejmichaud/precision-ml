@@ -183,7 +183,7 @@ def cfg():
 # /___\  |o___O__|
 # --------------------------
 @ex.automain
-def run(eqn, N_parameters, depth, lr, activation, 
+def run(eqn, width, depth, lr, activation, 
             N_TEST_POINTS, TEST_COMPACTIFICATION, MAX_TRAIN_ITERS, MAX_BATCH_SIZE,
             spreadsheet, device, dtype, seed, _log):
     """This version gets its data not from the fixed collection of 1M points, but rather
@@ -216,7 +216,7 @@ def run(eqn, N_parameters, depth, lr, activation,
 
     # create model
     assert eqn in NAME_TO_MODULE
-    modular_mlp = NAME_TO_MODULE[eqn](N_parameters, depth, activation_fn, device)
+    modular_mlp = NAME_TO_MODULE[eqn](width, depth, activation_fn, device)
     _log.debug("Created model.")
     _log.debug(f"Model has {sum(t.numel() for t in modular_mlp.parameters())} parameters")
     ex.info['parameters'] = sum(t.numel() for t in modular_mlp.parameters())
