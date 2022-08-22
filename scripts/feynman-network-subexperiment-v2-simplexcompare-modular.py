@@ -75,6 +75,19 @@ class I_8_14(nn.Module):
         ys = self.mlpys(x[:, 2:])
         return self.mlpaddsqrt(torch.cat([xs, ys], dim=1))
 
+class Z_007(nn.Module):
+    def __init__(self, width, depth, activation_fn, device):
+        super().__init__()
+        assert depth % 2 == 0, "For this problem, modular architecture has two steps"
+        self.device = device
+        self.mlpxy = make_mlp(2, depth // 2, width, activation_fn).to(device)
+        self.mlphz = make_mlp(2, depth // 2, width, activation_fn).to(device)
+    
+    def forward(self, x):
+        x = x.to(self.device)
+        xsuby_1 = self.mlpxs(x[:, :2])
+        return self.mlphz(torch.cat([xsuby_1, x[:, 2:]], dim=1))
+
 # class I_39_22(nn.Module):
 #     def __init__(self, N, depth, activation_fn, device):
 #         super().__init__()
@@ -133,6 +146,7 @@ class II_6_15a(nn.Module):
 
 NAME_TO_MODULE = {
     'I.8.14': I_8_14,
+    'Z.007': Z_007,
     # 'I.44.4': I_44_4,
     'II.6.15a': II_6_15a
 }
