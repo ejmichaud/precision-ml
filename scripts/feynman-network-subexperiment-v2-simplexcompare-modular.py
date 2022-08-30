@@ -85,7 +85,7 @@ class Z_007(nn.Module):
     
     def forward(self, x):
         x = x.to(self.device)
-        xsuby_1 = self.mlpxs(x[:, :2])
+        xsuby_1 = self.mlpxy(x[:, :2])
         return self.mlphz(torch.cat([xsuby_1, x[:, 2:]], dim=1))
 
 # class I_39_22(nn.Module):
