@@ -1,4 +1,10 @@
 
+log/
+*.pickle
+*.pkl
+data/
+depreciated/
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,linux,macos
 

@@ -188,7 +188,97 @@ class GreedyEnsembleOptimizer(torch.optim.Optimizer):
         # TODO: possibly return loss here. 
                     
 
+class L4(torch.optim.Optimizer):
+    """Implements the L4 ``meta-optimizer'' from:
+    https://arxiv.org/abs/1802.05074
+    
+    Args:
+        params (iterable): iterable of parameters to optimize
+        optimizer (torch.optim.Optimizer): optimizer to get step direction from
+
+    Example:
+        >>> opt = torch.optim.Adam(model.parameters())
+        >>> optimizer = L4(model.parameters, opt)
+        >>> optimizer.zero_grad()
+        >>> loss_fn(model(input), target).backward()
+        >>> optimizer.step(closure)
+    """
+    
+    def __init__(self, params, optimizer, 
+            alpha=0.15, gamma=0.9, tau=1e3, eps=1e-12):
+        defaults = dict()
+        super(L4, self).__init__(params, defaults)
+        self.optimizer = optimizer
+        self.state = dict(alpha=alpha, gamma=gamma, tau=tau, eps=eps)
+        self.Lmin = None
+
+    def _dot_prod(self, vecs1, vecs2):
+        """Helper function for computing dot product between two vectors, where
+        the vector elements are spread out across a list of tensors.
         
+        Args:
+            vecs1, vecs2 (list[torch.Tensor]): vectors to take product of
+        
+        Returns:
+            float
+        """
+        assert len(vecs1) == len(vecs2)
+        assert all(vecs1[i].shape == vecs2[i].shape for i in range(len(vecs1)))
+        result = 0
+        for i in range(len(vecs1)):
+            result += torch.sum(vecs1[i] * vecs2[i])
+        return result
+
+    @torch.no_grad()
+    def step(self, closure=None):
+        """Perform an optimization step in the direction of self.optimizer
+        but with a step size given by the L4 update rule.
+        
+        Args:
+            closure (callable): An function that takes no arguments and
+                evaluates the model's loss and returns it. Unlike in first-order
+                methods, this argument is not optional.
+        """
+        assert closure, "Loss closure needed for L4 optimization"
+        loss = closure()
+
+        params_with_grad = []
+        d_p_list = []
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is not None:
+                    params_with_grad.append(p)
+                    d_p_list.append(p.grad.clone())
+        
+        # save parameters of model
+        initial_params_with_grad_data = [param.data.detach().clone() 
+                    for param in params_with_grad]
+
+        self.optimizer.step(closure)
+        stepped_params_with_grad_data = [param.data.detach().clone()
+                    for param in params_with_grad]
+
+        for i, param in enumerate(params_with_grad):
+            param.data = initial_params_with_grad_data[i]
+
+        v = [
+            initial_params_with_grad_data[i] - stepped_params_with_grad_data[i]
+            for i in range(len(params_with_grad))
+        ]
+
+        if self.Lmin is None:
+            self.Lmin = 0.75 * loss
+        else:
+            self.Lmin = min(loss, self.Lmin)
+
+        lr = self.state['alpha'] * (loss - self.state['gamma'] * self.Lmin) / (self._dot_prod(d_p_list, v) + self.state['eps'])
+        for i, param in enumerate(params_with_grad):
+            param.add_(-lr * v[i])
+        
+        self.Lmin *= (1 + 1 / self.state['tau'])
+
+
+
 # class GradientSearch(torch.optim.Optimizer):
 #     def __init__(self, params):
 #         defaults = dict()
