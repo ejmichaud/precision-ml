@@ -144,7 +144,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed(0)
 
     eqn = 'I.11.19'
-    equations = pd.read_csv("../equations.csv")
+    equations = pd.read_csv("../../equations.csv")
     row = equations[equations['Equation'] == eqn].iloc[0]
     dimension = int(row['# variables'])
     formula = row['Formula']
@@ -258,7 +258,7 @@ if __name__ == '__main__':
             return l
 
         # perform search and step
-        lr = logarithmic_line_search(f)
+        lr = logarithmic_line_search(f, low=1e-30, points=70)
         with torch.no_grad():
             for i, p in enumerate(mlp.parameters()):
                 p.add_(-lr * v_g[i])
@@ -368,7 +368,7 @@ if __name__ == '__main__':
             return l
 
         # perform search and step
-        lr = logarithmic_line_search(f)
+        lr = logarithmic_line_search(f, low=1e-50, points=70)
         with torch.no_grad():
             for i, p in enumerate(mlp2.parameters()):
                 p.add_(-lr * v_g[i])
@@ -377,7 +377,7 @@ if __name__ == '__main__':
         results['train4'].append(rmse_loss_fn_torch(mlp(x_i) + (1/c)*mlp2(x_i), y_i).item())
         results['test4'].append(rmse_loss_fn_torch(mlp(x_i_test) + (1/c)*mlp2(x_i_test), y_i_test).item())
 
-    with open('../data/custom/combined-techniques-eqn-2.pickle', 'wb') as handle:
+    with open('../../data/custom/combined-techniques-eqn-2.pickle', 'wb') as handle:
         pickle.dump(results, handle)
 
 

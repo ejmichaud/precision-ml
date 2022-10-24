@@ -258,7 +258,7 @@ if __name__ == '__main__':
             return l
 
         # perform search and step
-        lr = logarithmic_line_search(f)
+        lr = logarithmic_line_search(f, low=1e-25, points=70)
         with torch.no_grad():
             for i, p in enumerate(mlp.parameters()):
                 p.add_(-lr * v_g[i])
@@ -368,7 +368,7 @@ if __name__ == '__main__':
             return l
 
         # perform search and step
-        lr = logarithmic_line_search(f)
+        lr = logarithmic_line_search(f, low=1e-25, points=70)
         with torch.no_grad():
             for i, p in enumerate(mlp2.parameters()):
                 p.add_(-lr * v_g[i])
