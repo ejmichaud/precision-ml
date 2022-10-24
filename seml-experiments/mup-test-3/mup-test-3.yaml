@@ -1,0 +1,61 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2-simplexcompare-mup-normalize.py
+  name: mup-test-3
+  output_dir: seml-experiments/mup-test-3/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 200
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 5G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-05:00     # max time, D-HH:MM
+
+fixed:
+  MAX_TRAIN_ITERS: 20000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  MAX_BATCH_SIZE: 30000
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+  lr: 1e-3
+  activation: "Tanh"
+
+I814:
+  fixed:
+    eqn: "I.44.4"
+  grid:
+    depth:
+      type: choice
+      options:
+        - 2
+        - 3
+        - 4
+    width:
+      type: choice
+      options:
+        - 6
+        - 10
+        - 14
+        - 18
+        - 25
+        - 45
+        - 90
+        - 180
+        - 720
+    seed:
+      type: choice
+      options:
+        - 0
+        - 1
+        - 2
+        - 3
+
+
+
+
+
+

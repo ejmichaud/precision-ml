@@ -1,0 +1,51 @@
+
+seml:
+  executable: scripts/feynman-simplex-subexperiment-v2.py
+  name: feynman-simplex-4
+  output_dir: seml-experiments/feynman-simplex-4/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 100
+  sbatch_options:
+    mem: 32G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-00:45     # max time, D-HH:MM
+
+fixed:
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "Z.001"
+      - "II.8.31"
+      - "I.30.5"
+      - "I.8.14"
+      - "I.44.4"
+      - "II.6.15a"
+
+  TRAIN_POINTS:
+    type: choice
+    options:
+      - 64
+      - 256
+      - 1024
+      - 4096
+      - 16384
+      - 65536
+      - 262144
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+

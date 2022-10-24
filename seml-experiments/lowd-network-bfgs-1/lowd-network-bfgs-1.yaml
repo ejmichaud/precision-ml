@@ -1,0 +1,88 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2-simplexcompare-bfgs.py
+  name: lowd-network-bfgs-1
+  output_dir: seml-experiments/lowd-network-bfgs-1/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 20
+  sbatch_options:
+    # gres: gpu:1       # num GPUs
+    mem: 20G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-02:00     # max time, D-HH:MM
+
+fixed:
+  MAX_TRAIN_ITERS: 20000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "Z.001"    # 1d
+      - "Z.002"    # 1d
+      - "Z.003"    # 1d
+      - "I.6.2"    # 2d
+      - "I.29.4"   # 2d
+      - "II.8.31"  # 2d
+  activation:
+    type: choice
+    options:
+      - "ReLU"
+      - "Tanh"
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+depth2:
+  fixed:
+    depth: 2
+  grid:
+    width:
+      type: choice
+      options:
+        - 51
+        - 204
+        - 819
+        - 3276
+        - 13107
+        - 52428
+
+depth3:
+  fixed:
+    depth: 3
+  grid:
+    width:
+      type: choice
+      options:
+        - 13
+        - 29
+        - 61
+        - 125
+        - 253
+        - 509
+
+depth4:
+  fixed:
+    depth: 4
+  grid:
+    width:
+      type: choice
+      options:
+        - 9
+        - 20
+        - 43
+        - 88
+        - 179
+        - 360
+

@@ -1,0 +1,44 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2.py
+  name: feynman-network-gridsearch-test
+  output_dir: seml-experiments/feynman-network-gridsearch-test/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 12G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-02:00     # max time, D-HH:MM
+
+fixed:
+  eqn: "I.44.4"
+  MAX_TRAIN_ITERS: 20000
+  MAX_BATCH_SIZE: 20000
+  N_TEST_POINTS: 20000
+  TEST_COMPACTIFICATION: 0.8
+  feynman_spreadsheet: "/om/user/ericjm/Downloads/FeynmanEquations.csv"
+  depth: 3
+  lr: 0.001
+
+grid:
+  width:
+    type: choice
+    options:
+      - 5
+      # - 13
+      - 29
+      # - 61
+      - 125
+      # - 253
+      - 509
+  TRAIN_POINTS:
+    type: loguniform
+    min: 256
+    max: 200000
+    num: 4
+
+

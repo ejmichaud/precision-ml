@@ -1,0 +1,97 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment.py
+  name: feynman-network-2
+  output_dir: seml-experiments/feynman-network-2/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 12G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-02:00     # max time, D-HH:MM
+
+fixed:
+  MAX_TRAIN_ITERS: 20000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  DATA_RATIO: 1.0
+  MAX_BATCH_SIZE: 30000
+  data_dir: "/om/user/ericjm/Downloads/Feynman_with_units"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "I.6.2"    # 2d
+      - "II.8.31"  # 2d
+      - "I.10.7"   # 3d
+      - "I.30.5"   # 3d
+      - "I.8.14"   # 4d
+      - "I.39.22"  # 4d
+      - "I.44.4"   # 5d
+      - "I.12.11"  # 5d
+      - "II.6.15a" # 6d
+      - "I.11.19"  # 6d
+  lr:
+    type: choice
+    options:
+      # - 0.01
+      - 0.001
+      # - 0.0001
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+depth2:
+  fixed:
+    depth: 2
+  grid:
+    width:
+      type: choice
+      options:
+        - 12
+        - 51
+        - 204
+        - 819
+        - 3276
+        - 13107
+        - 52428
+
+depth3:
+  fixed:
+    depth: 3
+  grid:
+    width:
+      type: choice
+      options:
+        - 5
+        - 13
+        - 29
+        - 61
+        - 125
+        - 253
+        - 509
+
+depth4:
+  fixed:
+    depth: 4
+  grid:
+    width:
+      type: choice
+      options:
+        - 4
+        - 9
+        - 20
+        - 43
+        - 88
+        - 179
+        - 360
+

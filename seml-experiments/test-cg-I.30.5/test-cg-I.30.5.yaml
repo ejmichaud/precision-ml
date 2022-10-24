@@ -1,0 +1,79 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2-simplexcompare-cg.py
+  name: test-cg-I.30.5
+  output_dir: seml-experiments/test-cg-I.30.5/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 200
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 25G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-03:00     # max time, D-HH:MM
+
+fixed:
+  eqn: "I.30.5"
+  MAX_TRAIN_ITERS: 25000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+
+grid:
+  activation:
+    type: choice
+    options:
+      - "ReLU"
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+depth2:
+  fixed:
+    depth: 2
+  grid:
+    width:
+      type: choice
+      options:
+        - 51
+        - 204
+        - 819
+        - 3276
+        - 13107
+        - 52428
+
+depth3:
+  fixed:
+    depth: 3
+  grid:
+    width:
+      type: choice
+      options:
+        - 13
+        - 29
+        - 61
+        - 125
+        - 253
+        - 509
+
+depth4:
+  fixed:
+    depth: 4
+  grid:
+    width:
+      type: choice
+      options:
+        - 9
+        - 20
+        - 43
+        - 88
+        - 179
+        - 360
+

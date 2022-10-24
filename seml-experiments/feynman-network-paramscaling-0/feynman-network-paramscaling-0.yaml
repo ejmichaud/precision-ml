@@ -1,0 +1,70 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2.py
+  name: feynman-network-paramscaling-0
+  output_dir: seml-experiments/feynman-network-paramscaling-0/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 45
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 5G           # memory
+    cpus-per-task: 2  # num cores
+    time: 0-02:00     # max time, D-HH:MM
+
+fixed:
+  MAX_TRAIN_ITERS: 20000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  MAX_BATCH_SIZE: 30000
+  depth: 4
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "I.8.14"   # 4d
+      - "II.6.15a" # 6d
+  activation:
+    type: choice
+    options:
+      - "ReLU"
+  lr:
+    type: choice
+    options:
+      - 0.001
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+  TRAIN_POINTS:
+    type: choice
+    options:
+      - 64
+      - 256
+      - 1024
+      - 4096
+      - 16384
+      - 65536
+      - 262144  
+  width:
+    type: choice
+    options:
+      - 9
+      - 14
+      - 20
+      - 30
+      - 43
+      - 62
+      - 88
+      - 179
+      - 360
+
+

@@ -1,0 +1,66 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment-v2-simplexcompare-modular.py
+  name: feynman-network-modular-2
+  output_dir: seml-experiments/feynman-network-modular-2/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  max_simultaneous_jobs: 100
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 5G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-02:00     # max time, D-HH:MM
+
+fixed:
+  MAX_TRAIN_ITERS: 20000
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  MAX_BATCH_SIZE: 30000
+  spreadsheet: "/om2/user/ericjm/precision-ml/equations.csv"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "I.8.14"   # 4d
+      - "II.6.15a" # 6d
+  lr:
+    type: choice
+    options:
+      # - 0.01
+      - 0.001
+      # - 0.0001
+  activation:
+    type: choice
+    options:
+      - "ReLU"
+      # - "Tanh"
+  N_parameters:
+    type: choice
+    options:
+      - 512
+      - 1024
+      - 2024
+      - 4096
+      - 8192
+      - 16384
+      - 65536
+  depth:
+    type: choice
+    options:
+      - 2
+      - 3
+      - 4
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+

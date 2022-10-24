@@ -1,0 +1,54 @@
+
+seml:
+  executable: scripts/feynman-simplex-subexperiment.py
+  name: feynman-simplex-1
+  output_dir: seml-experiments/feynman-simplex-1/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 1
+  sbatch_options:
+    mem: 32G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-00:30     # max time, D-HH:MM
+
+fixed:
+  N_TEST_POINTS: 30000
+  TEST_COMPACTIFICATION: 0.8
+  data_dir: "/om/user/ericjm/Downloads/Feynman_with_units"
+
+grid:
+  eqn:
+    type: choice
+    options:
+      - "I.6.2"    # 2d
+      - "II.8.31"  # 2d
+      - "I.10.7"   # 3d
+      - "I.30.5"   # 3d
+      - "I.8.14"   # 4d
+      - "I.39.22"  # 4d
+      - "I.44.4"   # 5d
+      - "I.12.11"  # 5d
+      - "II.6.15a" # 6d
+      - "I.11.19"  # 6d
+
+  TRAIN_POINTS:
+    type: choice
+    options:
+      - 64
+      - 256
+      - 1024
+      - 4096
+      - 16384
+      - 65536
+      - 262144
+  seed:
+    type: choice
+    options:
+      - 0
+      - 1
+      - 2
+      - 3
+
+

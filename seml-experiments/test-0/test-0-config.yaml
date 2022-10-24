@@ -1,0 +1,39 @@
+
+seml:
+  executable: scripts/feynman-network-subexperiment.py
+  name: test-0
+  output_dir: seml-experiments/test-0/log
+  project_root_dir: ../../
+  conda_environment: torch-cuda
+
+slurm:
+  experiments_per_job: 2
+  sbatch_options:
+    gres: gpu:1       # num GPUs
+    mem: 4G          # memory
+    cpus-per-task: 2  # num cores
+    time: 0-01:00     # max time, D-HH:MM
+
+fixed:
+  eqn: "I.10.7"
+  MAX_TRAIN_ITERS: 5000
+  data_dir: "/om/user/ericjm/Downloads/Feynman_with_units"
+  width: 40
+
+grid:
+  lr:
+    type: choice
+    options:
+      - 0.01
+      - 0.001
+      - 0.0001
+  
+# depth2:
+#   depth: 2
+#   width:
+#     type: choice
+#     options:
+#       - 5
+#       - 13
+#       - 29
+#       - 61
