@@ -1,6 +1,6 @@
 # precision-ml
 
-This repository contains code for the paper `Precision Machine Learning`, by Eric J. Michaud, Ziming Liu, and Max Tegmark.
+This repository contains code for the paper `Precision Machine Learning`, by [Eric J. Michaud](https://ericjmichaud.com), [Ziming Liu](https://kindxiaoming.github.io/), and [Max Tegmark](https://space.mit.edu/home/tegmark/home.html).
 
 ## Organization
 
