@@ -97,5 +97,7 @@ def run(eqn, TRAIN_POINTS, N_TEST_POINTS, TEST_COMPACTIFICATION, feynman_spreads
     valid_idx = ~np.isnan(preds)
     rmse_loss = np.sqrt(np.mean(np.power(preds[valid_idx] - ys_test[valid_idx], 2)))
     ex.info['test'] = rmse_loss.item()
-
+    relative_rmse_loss = np.sqrt(np.mean(np.power(preds[valid_idx] - ys_test[valid_idx], 2))) / \
+                            np.sqrt(np.mean(np.power(ys_test[valid_idx], 2)))
+    ex.info['test_relative'] = relative_rmse_loss.item()
 
